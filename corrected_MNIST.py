@@ -26,7 +26,8 @@ def conv_layer(input, size_in, size_out, name="conv"):
   with tf.name_scope(name):
     #w = tf.Variable(tf.zeros([5, 5, size_in, size_out]), name="W")
     #b = tf.Variable(tf.zeros([size_out]), name="B")
-    w = tf.Variable(tf.truncated_normal([5, 5, size_in, size_out], stddev=0.1), name="W")
+    # w = tf.Variable(tf.truncated_normal([5, 5, size_in, size_out], stddev=0.1), name="W")
+    w = tf.Variable(tf.fill([5, 5, size_in, size_out], 0.05), name="W")
     b = tf.Variable(tf.constant(0.1, shape=[size_out]), name="B")
     conv = tf.nn.conv2d(input, w, strides=[1, 1, 1, 1], padding="SAME")
     act = tf.nn.relu(conv + b)
@@ -39,7 +40,8 @@ def conv_layer(input, size_in, size_out, name="conv"):
 # Add fully connected layer
 def fc_layer(input, size_in, size_out, final=False, name="fc"):
   with tf.name_scope(name):
-    w = tf.Variable(tf.truncated_normal([size_in, size_out], stddev=0.1), name="W")
+    #w = tf.Variable(tf.truncated_normal([size_in, size_out], stddev=0.1), name="W")
+    w = tf.Variable(tf.fill([size_in, size_out], 0.05), name="W")
     b = tf.Variable(tf.constant(0.1, shape=[size_out]), name="B")
     act = tf.matmul(input, w) + b if final else tf.nn.relu(tf.matmul(input, w) + b)
     tf.summary.histogram("weights", w)
@@ -87,6 +89,7 @@ def mnist_model(learning_rate, use_two_conv, use_two_fc, hparam, list_data, list
 
   with tf.name_scope("train"):
     train_step = tf.train.MomentumOptimizer(learning_rate,0.9).minimize(xent)
+    #train_step = tf.train.AdamOptimizer(learning_rate).minimize(xent)
 
   with tf.name_scope("accuracy"):
     correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y, 1))
@@ -136,10 +139,10 @@ def mnist_model(learning_rate, use_two_conv, use_two_fc, hparam, list_data, list
       saver.save(sess, os.path.join(LOGDIR, "model.ckpt"), i)
     sess.run(train_step, feed_dict={x: batch[0], y: batch[1]})
   
-    # calculating test accuracy for the final 50 batches
-    if n-i <= 50:
-      tmp = sess.run(test_accuracy, feed_dict={x: mnist.test.images, y:mnist.test.labels})
-      print('test_accuracy ' + str(i) + ' :' + str(tmp))
+    # # calculating test accuracy for the final 50 batches
+    # if n-i <= 50:
+    #   tmp = sess.run(test_accuracy, feed_dict={x: mnist.test.images, y:mnist.test.labels})
+    #   print('test_accuracy ' + str(i) + ' :' + str(tmp))
 
     end_time = time.time() - start_time
 
@@ -147,7 +150,7 @@ def mnist_model(learning_rate, use_two_conv, use_two_fc, hparam, list_data, list
     if i+1 == n:
       test_tmp_list = [test_accuracy, end_time]
       tmp_list = [train_accuracy, end_time]
-      list_test_accuracy.append(tmp)
+      #list_test_accuracy.append(tmp)
       list_data.append(tmp_list)
       print(list_data)
 
