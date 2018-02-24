@@ -169,7 +169,7 @@ def main():
   # You can try adding some more learning rates
   #for learning_rate in [1E-3, 1E-4, 1E-5]:
   #for learning_rate in [1E-2,1E-4,1E-6]:
-  for learning_rate in [1E-1, 1E-2, 1E-3]:
+  for learning_rate in [1E-2]:
     print("======" + str(learning_rate) + "==========")
     # Include "False" as a value to try different model architectures
     #for use_two_fc in [True, False]:
